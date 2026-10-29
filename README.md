@@ -41,6 +41,18 @@ python3 -m http.server 8000   # luego abre http://localhost:8000
 
 **Publicarlo con GitHub Pages:** *Settings → Pages → Deploy from a branch → `main` / root*.
 
+## App instalable (PWA)
+
+El juego es una **Progressive Web App**: se puede instalar en tablet, celular o computador y funciona **sin conexión** después de la primera visita.
+
+- **Chrome / Edge (Android, Windows, macOS):** aparece el botón **📲 Instalar** en la barra superior (o el ícono de instalar en la barra de direcciones).
+- **Safari en iPad / iPhone:** botón *Compartir* → **Agregar a pantalla de inicio**.
+- **Safari en Mac:** *Archivo* → **Agregar al Dock**.
+
+> La PWA requiere servirse por `https://` (GitHub Pages) o `http://localhost`. Abriendo `index.html` con doble clic el juego funciona, pero sin instalación ni modo offline.
+
+**Publicar una nueva versión:** cambia `VERSION` en `sw.js` para que los dispositivos descarguen la actualización y borren la caché anterior.
+
 ### Navegadores
 
 Chrome, Edge y Safari recientes (escritorio, tablet y móvil). El arrastre funciona con mouse, dedo o lápiz; también se puede tocar una tarjeta y luego la habitación, o usar el teclado (Tab + Enter).
@@ -48,7 +60,10 @@ Chrome, Edge y Safari recientes (escritorio, tablet y móvil). El arrastre funci
 ## Estructura
 
 ```
-index.html        # juego completo (HTML + CSS + JS, sin dependencias)
+index.html             # juego completo (HTML + CSS + JS, sin dependencias)
+manifest.webmanifest   # metadatos de la app instalable
+sw.js                  # service worker: caché offline
+icons/                 # íconos de la app (SVG, PNG y maskable)
 README.md
 CONTRIBUTING.md
 LICENSE
@@ -62,6 +77,8 @@ Dentro de `index.html` el script está dividido en secciones: datos de la unidad
 - Solo guarda en el navegador las estrellas obtenidas y las preferencias de sonido (validadas al leerse).
 - Todo el contenido es estático; el texto se inserta con `textContent`.
 - Única dependencia externa: tipografías de Google Fonts (con fuentes de respaldo si no cargan).
+- `Content-Security-Policy` estricta: el script inline está autorizado por hash SHA-256 y no se permite `eval`, `object`, formularios ni `<base>` externos. **Si editas el `<script>` de `index.html`, recalcula el hash** (ver `CONTRIBUTING.md`).
+- El service worker solo guarda en caché archivos propios y las tipografías; no intercepta ningún otro dominio.
 
 ## Créditos
 

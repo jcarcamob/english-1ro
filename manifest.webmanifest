@@ -1,0 +1,20 @@
+{
+  "name": "My House – Inglés 1° básico",
+  "short_name": "My House",
+  "description": "Juego de inglés para 1° básico: Unidad 6 «My House» (habitaciones, objetos y acciones).",
+  "lang": "es-CL",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#D8EEF6",
+  "theme_color": "#C42341",
+  "categories": ["education", "kids", "games"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

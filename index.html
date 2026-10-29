@@ -3,7 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-n/7vgpwLxH4rBkL/a1sSbl5JR/bpOk8Z5yDW6bmE4vM='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
 <meta name="description" content="Juego web de inglés para 1° básico: Unidad 6 My House (habitaciones, objetos y acciones).">
+<meta name="theme-color" content="#C42341">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="icons/icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="My House">
 <title>My House Game</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,6 +25,7 @@ body { margin: 0; }
 img { max-width: 100%; }
 [hidden] { display: none !important; }
 :root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+@media (display-mode: standalone) { .topbar { padding-top: max(10px, env(safe-area-inset-top, 0px)); } }
 /* Layout: a picture-book apartment building. The roof holds the title, each window is an activity,
    the front door opens the explorable house. Single bright "storybook" theme on purpose (kids' book look). */
 :root {
@@ -339,6 +351,7 @@ h1, h2, h3 { font-family: var(--f-display); line-height: 1.1; text-wrap: balance
       <span>My House</span>
     </button>
     <div class="spacer"></div>
+    <button class="pill-btn" id="installBtn" type="button" hidden aria-label="Instalar la app"><span class="emoji" aria-hidden="true">📲</span><span class="btn-txt">Instalar</span></button>
     <span class="star-total" id="starTotal" aria-live="polite"></span>
     <button class="pill-btn" id="slowBtn" type="button" aria-pressed="false" aria-label="Voz lenta"><span class="emoji" aria-hidden="true">🐢</span><span class="btn-txt">Lento</span></button>
     <button class="pill-btn" id="soundBtn" type="button" aria-pressed="true" aria-label="Sonido"><span class="emoji" aria-hidden="true" id="soundIcon">🔊</span><span class="btn-txt">Sonido</span></button>
@@ -1137,6 +1150,25 @@ SCREENS.cloud = () => {
 function routeFromHash() { const n = location.hash.slice(1); go(n && SCREENS[n] ? n : 'home'); }
 window.addEventListener('hashchange', routeFromHash);
 routeFromHash();
+
+/* =========================================================
+   9. PWA — service worker + botón "Instalar"
+   ========================================================= */
+(function pwa() {
+  if ('serviceWorker' in navigator && window.isSecureContext && location.protocol !== 'file:') {
+    window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(() => {}); });
+  }
+  let deferred = null;
+  const btn = document.getElementById('installBtn');
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; btn.hidden = false; });
+  btn.addEventListener('click', async () => {
+    if (!deferred) return;
+    btn.hidden = true;
+    try { deferred.prompt(); await deferred.userChoice; } catch (_) {}
+    deferred = null;
+  });
+  window.addEventListener('appinstalled', () => { btn.hidden = true; deferred = null; });
+})();
 </script>
 </body>
 </html>
