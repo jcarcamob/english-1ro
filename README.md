@@ -7,7 +7,7 @@ El niño aprende y practica:
 - **Habitaciones:** living room, kitchen, bathroom, bedroom, dining room, balcony, garden.
 - **Objetos y muebles:** sofa, TV, lamp, fridge, stove, toilet, shower, sink, bed, table, chair…
 - **Acciones:** read a book, watch TV, cook, take a shower, brush my teeth, sleep, play, eat lunch…
-- **Frases:** *This is the kitchen.* · *I cook in the kitchen.* · *Where's Cloud?*
+- **Frases:** *This is the kitchen.* · *I cook in the kitchen.* · *Where's Michi?*
 
 ## Actividades
 
@@ -18,7 +18,7 @@ El niño aprende y practica:
 | Where does it go? | Drag & drop | Llevar cada objeto a su habitación |
 | What do you do here? | Drag & drop | Llevar cada acción a su habitación |
 | Trace and complete | Drag & drop | Completar oraciones y la letra que falta |
-| Where's Cloud? | Escuchar y tocar | Comprensión auditiva (cuento de la unidad) |
+| Where's Michi? | Escuchar y tocar | Comprensión auditiva: encontrar al gato Michi (inspirado en el cuento de la unidad) |
 | My Progress | Quiz | Repaso final con estrellas |
 
 Todo se escucha en voz alta en inglés (Web Speech API); las instrucciones también se leen en español. El botón 🐢 hace la voz más lenta.

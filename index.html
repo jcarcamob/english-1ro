@@ -243,7 +243,7 @@ h1, h2, h3 { font-family: var(--f-display); line-height: 1.1; text-wrap: balance
 .letter-box.blank { min-width: 0; width: 1.25em; border: 3px dashed var(--crimson); border-radius: 10px; padding: 0; }
 .letter-box.blank.filled { border-style: solid; }
 
-/* ---------- House (explore + Cloud) ---------- */
+/* ---------- House (explore + Michi) ---------- */
 .explore { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 18px; align-items: start; }
 .house { max-width: 560px; width: 100%; margin: 0 auto; }
 .house-roof { height: 70px; background: var(--crimson) radial-gradient(var(--dot) 2.4px, transparent 3px) 0 0 / 16px 16px; clip-path: polygon(0 100%, 12% 0, 88% 0, 100% 100%); }
@@ -303,6 +303,9 @@ h1, h2, h3 { font-family: var(--f-display); line-height: 1.1; text-wrap: balance
 @keyframes catpop { 0% { transform: translateX(-50%) scale(.4); opacity: 0; } 70% { transform: translateX(-50%) scale(1.15); opacity: 1; } 100% { transform: translateX(-50%) scale(1); } }
 @keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-8px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(5px); } }
 .shake { animation: shake .4s ease; }
+.next-row { display: flex; justify-content: flex-end; margin-top: 18px; }
+.next-btn { min-height: 56px; font-family: var(--f-display); font-weight: 800; font-size: 20px; padding: 8px 26px; color: var(--ink-soft); border-style: dashed; }
+.next-btn.primary { color: #fff; border-style: solid; animation: pop .35s ease; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 @media (max-width: 760px) {
@@ -428,7 +431,7 @@ const GAMES = [
   { id: 'objects',  icon: '🛏️', en: 'Where does it go?',    es: 'Arrastra cada objeto a su habitación', dnd: true },
   { id: 'actions',  icon: '🛀', en: 'What do you do here?', es: 'Arrastra cada acción a su habitación', dnd: true },
   { id: 'complete', icon: '✏️', en: 'Trace and complete',   es: 'Completa palabras y oraciones', dnd: true },
-  { id: 'cloud',    icon: '🐱', en: "Where's Cloud?",       es: 'Escucha y encuentra al gato Cloud', dnd: false },
+  { id: 'cloud',    icon: '🐱', en: "Where's Michi?",       es: 'Escucha y encuentra al gato Michi', dnd: false },
   { id: 'quiz',     icon: '⭐', en: 'My Progress',          es: 'Prueba final de la unidad', dnd: false }
 ];
 const GAME_IDS = GAMES.map(g => g.id);
@@ -645,8 +648,6 @@ function createDnD({ onDrop, onPick }) {
 const app = document.getElementById('app');
 let teardown = null; // cancels pending timers from the current screen
 function mount(node) {
-  if (teardown) teardown();
-  teardown = null;
   Voice.stop();
   document.querySelectorAll('.ghost, .overlay').forEach(n => n.remove());
   app.replaceChildren(node);
@@ -670,6 +671,8 @@ function go(name) {
   const fn = SCREENS[name] || SCREENS.home;
   const target = name in SCREENS ? name : 'home';
   if (location.hash.slice(1) !== target) { try { history.replaceState(null, '', target === 'home' ? location.pathname + location.search : '#' + target); } catch (_) {} }
+  if (teardown) teardown();   // stop the previous screen BEFORE building the new one
+  teardown = null;
   mount(fn());
 }
 
@@ -696,6 +699,23 @@ function activityShell(game, instrEn, instrEs, steps) {
 function starsFromMistakes(m, total) {
   const ratio = m / Math.max(1, total);
   return ratio <= 0.15 ? 3 : ratio <= 0.45 ? 2 : 1;
+}
+
+/** Bottom nav: "Saltar" before answering (counts as a miss), "Siguiente" once answered. */
+function nextBar(onNext, isLast) {
+  let ready = false;
+  const btn = h('button', { class: 'btn next-btn', type: 'button' });
+  const paint = () => {
+    btn.textContent = ready ? (isLast ? 'Ver resultado ⭐' : 'Siguiente ➜') : 'Saltar ➜';
+    btn.classList.toggle('primary', ready);
+    btn.setAttribute('aria-label', ready ? (isLast ? 'Ver resultado' : 'Siguiente pregunta') : 'Saltar esta pregunta');
+  };
+  paint();
+  btn.addEventListener('click', () => { btn.disabled = true; Voice.stop(); onNext(ready); });
+  return {
+    el: h('div', { class: 'next-row' }, btn),
+    ready() { ready = true; paint(); try { btn.focus({ preventScroll: true }); } catch (_) {} btn.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+  };
 }
 
 function finish(game, stars) {
@@ -775,7 +795,7 @@ SCREENS.home = () => {
       vocab('Parts of the house · Partes de la casa', PARTS, p => say(p.en))));
 };
 
-/* ---------- HOUSE (shared by Explore and Cloud) ---------- */
+/* ---------- HOUSE (shared by Explore and Michi) ---------- */
 function buildHouse({ onRoom, withDoor = true, activeId = null, showSeen = false }) {
   const tile = (room, extraCls) => {
     const objs = room.id === 'door' ? PARTS.slice(0, 2) : objsOf(room.id).slice(0, room.extra ? 2 : 3);
@@ -856,6 +876,11 @@ function choiceGame(game, instrEn, instrEs, rounds) {
     const r = rounds[i]; setStep(i);
     let locked = false, missed = false;
     const replay = () => r.speak();
+    const nav = nextBar(answered => {
+      if (!alive) return;
+      if (!answered && !missed) mistakes++;
+      i++; if (i < rounds.length) render(); else { setStep(rounds.length); finish(game, starsFromMistakes(mistakes, rounds.length)); }
+    }, i === rounds.length - 1);
     const prompt = h('div', { class: 'prompt-row' },
       r.visual || null,
       r.question ? h('div', { class: 'prompt-q', text: r.question }) : null,
@@ -867,10 +892,8 @@ function choiceGame(game, instrEn, instrEs, rounds) {
         if (locked) return;
         if (o.correct) {
           locked = true; b.classList.add('right'); word.classList.remove('hidden'); Sfx.ok(); announce('¡Correcto!');
-          await (o.after ? say(o.after) : say(o.label));
-          await wait(500);
-          if (!alive) return;
-          i++; if (i < rounds.length) render(); else { setStep(rounds.length); finish(game, starsFromMistakes(mistakes, rounds.length)); }
+          nav.ready();
+          say(o.after || o.label);
         } else {
           if (!missed) mistakes++; missed = true;
           b.classList.add('wrong'); shake(b); Sfx.no(); announce('Intenta otra vez');
@@ -879,7 +902,7 @@ function choiceGame(game, instrEn, instrEs, rounds) {
       });
       return b;
     }));
-    stage.replaceChildren(prompt, opts);
+    stage.replaceChildren(prompt, opts, nav.el);
     setTimeout(() => { if (alive) replay(); }, 250);
   }
   render();
@@ -996,6 +1019,7 @@ SCREENS.complete = () => {
   function render() {
     setStep(i); const r = rounds[i]; let missed = false, done = false;
     const tray = h('div', { class: 'tray' });
+    const nav = nextBar(answered => { if (!alive) return; if (!answered && !missed) mistakes++; next(); }, i === rounds.length - 1);
     if (r.type === 'sentence') {
       const room = roomById(r.a.room);
       const blank = h('span', { class: 'blank', 'aria-label': 'espacio vacío', text: '?' });
@@ -1008,7 +1032,7 @@ SCREENS.complete = () => {
           if (item._data === room) {
             done = true; Sfx.ok(); item.remove(); blank.textContent = room.en; blank.classList.add('filled');
             tray.querySelectorAll('.drag-item').forEach(b => { b.disabled = true; });
-            say(sentenceOf(r.a)).then(() => wait(700)).then(() => { if (alive) next(); });
+            nav.ready(); say(sentenceOf(r.a));
             return true;
           }
           if (!missed) { missed = true; mistakes++; }
@@ -1020,7 +1044,7 @@ SCREENS.complete = () => {
       stage.replaceChildren(
         h('div', { class: 'prompt-row' }, h('div', { class: 'prompt-pic' }, pic(r.a)),
           h('button', { class: 'listen-big', type: 'button', onclick: () => say('I ' + r.a.en + ' in the...') }, h('span', { class: 'emoji', 'aria-hidden': 'true', text: '🔊' }), 'Listen')),
-        sentence, tray);
+        sentence, tray, nav.el);
       setTimeout(() => { if (alive) say('I ' + r.a.en + ' in the...'); }, 250);
     } else {
       const word = r.w.word; const letters = [...word];
@@ -1040,7 +1064,7 @@ SCREENS.complete = () => {
           if (item._data === gap.ch) {
             done = true; Sfx.ok(); item.remove(); blank.textContent = gap.ch; blank.classList.add('filled');
             tray.querySelectorAll('.drag-item').forEach(b => { b.disabled = true; });
-            say(word).then(() => wait(700)).then(() => { if (alive) next(); });
+            nav.ready(); say(word);
             return true;
           }
           if (!missed) { missed = true; mistakes++; }
@@ -1054,7 +1078,7 @@ SCREENS.complete = () => {
       stage.replaceChildren(
         h('div', { class: 'prompt-row' }, visual,
           h('button', { class: 'listen-big', type: 'button', onclick: () => say(word) }, h('span', { class: 'emoji', 'aria-hidden': 'true', text: '🔊' }), 'Listen')),
-        row, tray);
+        row, tray, nav.el);
       setTimeout(() => { if (alive) say(word); }, 250);
     }
   }
@@ -1068,35 +1092,39 @@ SCREENS.cloud = () => {
   const N = 6; const targets = [];
   const pool = ROOMS.slice();
   while (targets.length < N) { const t = sample(pool, 1)[0]; if (t !== targets[targets.length - 1]) targets.push(t); }
-  const { root, stage, setStep } = activityShell(game, "Where's Cloud?", 'Cloud es un gato que se esconde. Escucha dónde está y toca esa habitación.', N);
+  const { root, stage, setStep } = activityShell(game, "Where's Michi?", 'Michi es un gato que se esconde. Escucha dónde está y toca esa habitación.', N);
   let i = 0, mistakes = 0, alive = true;
   teardown = () => { alive = false; };
   function render() {
     setStep(i); const t = targets[i]; let locked = false, missed = false;
-    const line = "Where's Cloud? Cloud is in the " + t.en + '.';
+    const line = "Where's Michi? Michi is in the " + t.en + '.';
+    const nav = nextBar(answered => {
+      if (!alive) return;
+      if (!answered && !missed) mistakes++;
+      i++; if (i < N) render(); else { setStep(N); finish(game, starsFromMistakes(mistakes, N)); }
+    }, i === N - 1);
     const house = buildHouse({
       withDoor: false,
       onRoom: async (room, tile) => {
         if (locked) return;
         if (room === t) {
           locked = true; tile.classList.add('right'); tile.append(h('span', { class: 'cat', 'aria-hidden': 'true', text: '🐱' }));
-          Sfx.ok(); announce('¡Encontraste a Cloud!');
-          await say('Meow! Yes! Cloud is in the ' + t.en + '!');
-          await wait(600); if (!alive) return;
-          i++; if (i < N) render(); else { setStep(N); finish(game, starsFromMistakes(mistakes, N)); }
+          Sfx.ok(); announce('¡Encontraste a Michi!');
+          nav.ready();
+          say('Meow! Yes! Michi is in the ' + t.en + '!');
         } else {
           if (!missed) { missed = true; mistakes++; }
           shake(tile); Sfx.no();
-          await say('No. Cloud is not in the ' + room.en + '.');
-          if (alive && !locked) say('Cloud is in the ' + t.en + '.');
+          await say('No. Michi is not in the ' + room.en + '.');
+          if (alive && !locked) say('Michi is in the ' + t.en + '.');
         }
       }
     });
     stage.replaceChildren(
       h('div', { class: 'prompt-row' },
-        h('div', { class: 'prompt-q' }, h('span', { class: 'emoji', 'aria-hidden': 'true', text: '🐱 ' }), "Where's Cloud?"),
+        h('div', { class: 'prompt-q' }, h('span', { class: 'emoji', 'aria-hidden': 'true', text: '🐱 ' }), "Where's Michi?"),
         h('button', { class: 'listen-big', type: 'button', onclick: () => say(line) }, h('span', { class: 'emoji', 'aria-hidden': 'true', text: '🔊' }), 'Listen')),
-      house);
+      house, nav.el);
     setTimeout(() => { if (alive) say(line); }, 250);
   }
   render();
