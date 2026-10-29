@@ -1,0 +1,1114 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Juego web de inglés para 1° básico: Unidad 6 My House (habitaciones, objetos y acciones).">
+<title>My House Game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Grandstander:wght@600;800&display=swap">
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+/* Layout: a picture-book apartment building. The roof holds the title, each window is an activity,
+   the front door opens the explorable house. Single bright "storybook" theme on purpose (kids' book look). */
+:root {
+  --crimson: #C42341;
+  --crimson-deep: #8F1430;
+  --dot: #E8627F;
+  --sky: #D8EEF6;
+  --brick: #F3BAC6;
+  --ink: #2A2233;
+  --ink-soft: #5D5368;
+  --paper: #FFFFFF;
+  --butter: #FFD25C;
+  --grass: #6DBE6A;
+  --door: #3E8FC6;
+  --ok: #23905A;
+  --ok-bg: #DDF5E6;
+  --no: #D2412F;
+  --no-bg: #FDE3DE;
+
+  --room-living: #FFD97A;
+  --room-kitchen: #9DC9F2;
+  --room-bathroom: #BCE6E1;
+  --room-bedroom: #B7E1B0;
+  --room-dining: #F7A9BD;
+  --room-balcony: #F7C59C;
+  --room-garden: #A7DA8F;
+  --room-door: #CFE3F5;
+
+  --f-display: 'Grandstander', 'Comic Sans MS', 'Chalkboard SE', system-ui, sans-serif;
+  --f-body: 'Andika', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+  --f-emoji: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
+
+  --r-lg: 22px;
+  --r-md: 14px;
+  color-scheme: light;
+}
+html, body { background: var(--sky); color: var(--ink); }
+body { font-family: var(--f-body); font-size: 17px; line-height: 1.45; -webkit-tap-highlight-color: transparent; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 4px solid var(--butter); outline-offset: 3px; border-radius: 10px; }
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.1; text-wrap: balance; margin: 0; }
+
+/* ---------- Top bar ---------- */
+.topbar {
+  background: var(--crimson) radial-gradient(var(--dot) 2.4px, transparent 3px) 0 0 / 18px 18px;
+  color: #fff;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 10px;
+}
+.topbar-in { max-width: 1040px; margin: 0 auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 8px; background: none; border: 0; padding: 4px 6px; font-family: var(--f-display); font-weight: 800; font-size: 20px; color: #fff; }
+.brand svg { width: 30px; height: 30px; }
+.spacer { flex: 1; }
+.pill-btn {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 6px 12px;
+  border-radius: 999px; border: 2px solid rgba(255,255,255,.85); background: rgba(255,255,255,.14); color: #fff;
+  font-weight: 700; font-size: 15px;
+}
+.pill-btn[aria-pressed="true"] { background: #fff; color: var(--crimson-deep); }
+.star-total { font-family: var(--f-display); font-weight: 800; font-size: 17px; padding: 6px 12px; border-radius: 999px; background: rgba(0,0,0,.18); font-variant-numeric: tabular-nums; }
+.emoji { font-family: var(--f-emoji); line-height: 1; }
+
+.wrap {
+  max-width: 1040px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 18px 40px;
+}
+
+/* ---------- Home: the building ---------- */
+.home-intro { text-align: center; margin: 4px auto 14px; max-width: 60ch; color: var(--ink-soft); }
+.building { max-width: 760px; margin: 0 auto; filter: drop-shadow(0 10px 0 rgba(42,34,51,.12)); }
+.roof {
+  position: relative; height: 128px;
+  background: var(--crimson) radial-gradient(var(--dot) 2.6px, transparent 3.2px) 0 0 / 20px 20px;
+  clip-path: polygon(0 100%, 10% 0, 90% 0, 100% 100%);
+  display: grid; place-items: center;
+}
+.roof-sign {
+  background: #FCE4EA; color: var(--crimson); border: 4px solid var(--crimson-deep);
+  border-radius: 999px; padding: 6px 26px 8px; text-align: center;
+}
+.roof-sign small { display: block; font-family: var(--f-body); font-weight: 700; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--crimson-deep); }
+.roof-sign h1 { font-size: clamp(30px, 6vw, 46px); font-weight: 800; letter-spacing: .02em; }
+.facade {
+  background:
+    repeating-linear-gradient(0deg, transparent 0 26px, rgba(143,20,48,.10) 26px 28px),
+    var(--brick);
+  border-inline: 6px solid var(--crimson-deep);
+  padding: 20px 18px;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px;
+}
+.win {
+  display: flex; flex-direction: column; text-align: left; padding: 0; overflow: hidden;
+  background: var(--paper); border: 3px solid var(--ink); border-radius: var(--r-md);
+  transition: transform .15s ease;
+}
+.win:hover { transform: translateY(-3px) rotate(-.6deg); }
+.win-glass {
+  position: relative; aspect-ratio: 16 / 10; display: grid; place-items: center;
+  background: linear-gradient(160deg, #EAF7FD 0 55%, #CBE8F6 55%);
+  border-bottom: 3px solid var(--ink);
+  font-size: clamp(34px, 7vw, 52px);
+}
+.win-glass::before, .win-glass::after { content: ""; position: absolute; background: var(--ink); opacity: .85; }
+.win-glass::before { left: 50%; top: 0; bottom: 0; width: 3px; transform: translateX(-50%); }
+.win-glass::after { top: 50%; left: 0; right: 0; height: 3px; transform: translateY(-50%); }
+.win-glass .emoji { position: relative; z-index: 1; background: #fff; border: 3px solid var(--ink); border-radius: 50%; width: 1.7em; height: 1.7em; display: grid; place-items: center; font-size: .72em; }
+.win-tag { position: absolute; z-index: 2; top: 6px; left: 6px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; background: var(--butter); border: 2px solid var(--ink); border-radius: 999px; padding: 1px 8px; }
+.win-body { padding: 8px 10px 10px; display: grid; gap: 2px; }
+.win-title { font-family: var(--f-display); font-weight: 800; font-size: 17px; line-height: 1.1; }
+.win-sub { font-size: 14px; color: var(--ink-soft); line-height: 1.25; }
+.stars { display: flex; gap: 2px; font-size: 18px; margin-top: 4px; }
+.stars .off { filter: grayscale(1); opacity: .28; }
+
+.ground {
+  position: relative; background: var(--brick); border-inline: 6px solid var(--crimson-deep);
+  display: grid; place-items: center; padding: 0 18px;
+}
+.door-btn {
+  display: grid; justify-items: center; gap: 4px; width: min(260px, 70%);
+  background: var(--door); color: #fff; border: 4px solid var(--ink); border-bottom: 0;
+  border-radius: 120px 120px 0 0; padding: 26px 16px 22px; position: relative;
+  box-shadow: inset 0 0 0 8px rgba(255,255,255,.18);
+}
+.door-btn::after { content: ""; position: absolute; right: 22px; top: 54%; width: 14px; height: 14px; border-radius: 50%; background: var(--butter); border: 3px solid var(--ink); }
+.door-btn .emoji { font-size: 40px; }
+.door-btn strong { font-family: var(--f-display); font-weight: 800; font-size: 22px; }
+.door-btn span.sub { font-size: 14px; opacity: .95; }
+.door-hint { position: absolute; left: 18px; top: 14px; background: var(--butter); border: 3px solid var(--ink); border-radius: 12px; padding: 4px 10px; font-weight: 700; font-size: 14px; transform: rotate(-4deg); }
+.lawn { height: 34px; background: var(--grass); border-top: 4px solid var(--ink); border-radius: 0 0 18px 18px;
+  background-image: radial-gradient(circle at 10px 0, #4E9E4C 6px, transparent 7px); background-size: 26px 20px; }
+
+.family { max-width: 760px; margin: 34px auto 0; display: grid; gap: 14px; }
+.family h2 { font-size: 22px; }
+.family p { margin: 0; color: var(--ink-soft); max-width: 65ch; }
+.vocab-group { display: grid; gap: 8px; }
+.vocab-group h3 { font-size: 15px; font-family: var(--f-body); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--crimson-deep); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; background: var(--paper); border: 2px solid var(--ink); border-radius: 999px; padding: 4px 12px 4px 6px; font-size: 15px; font-weight: 700; }
+.chip .pic { width: 26px; height: 26px; font-size: 20px; }
+.notice { background: var(--no-bg); border: 2px solid var(--no); border-radius: var(--r-md); padding: 10px 14px; max-width: 760px; margin: 0 auto 14px; }
+
+/* ---------- Pictures ---------- */
+.pic { display: inline-grid; place-items: center; font-family: var(--f-emoji); line-height: 1; min-width: 1.25em; height: 1.25em; white-space: nowrap; }
+.pic.is-svg { width: 1.25em; }
+.pic svg { width: 100%; height: 100%; display: block; }
+.room-mini { display: grid; place-items: center; border-radius: 12px; border: 3px solid var(--ink);
+  background: linear-gradient(to top, rgba(120,72,40,.20) 0 26%, transparent 26%), var(--wall);
+  font-family: var(--f-emoji); }
+.room-mini .objs { display: flex; gap: 2px; align-items: flex-end; }
+.opt .room-mini .pic, .drag-item .room-mini .pic { font-size: inherit; }
+
+/* ---------- Activity shell ---------- */
+.act-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.back-btn { display: inline-flex; align-items: center; gap: 6px; background: var(--paper); border: 3px solid var(--ink); border-radius: 999px; padding: 6px 14px; font-weight: 700; min-height: 44px; }
+.act-title { font-size: clamp(24px, 4vw, 32px); font-weight: 800; }
+.progress { display: flex; gap: 6px; margin-left: auto; }
+.progress i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--ink); background: var(--paper); }
+.progress i.done { background: var(--ok); }
+.progress i.now { background: var(--butter); }
+.instr { display: flex; align-items: center; gap: 12px; background: var(--paper); border: 3px solid var(--ink); border-radius: var(--r-lg); padding: 10px 14px; margin-bottom: 14px; }
+.instr-num { flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--crimson); color: #fff; display: grid; place-items: center; font-family: var(--f-display); font-weight: 800; font-size: 22px; }
+.instr-text { min-width: 0; }
+.instr-text strong { display: block; font-family: var(--f-display); font-size: 19px; }
+.instr-text span { color: var(--ink-soft); font-size: 15px; }
+.say-btn { flex: none; margin-left: auto; width: 48px; height: 48px; border-radius: 50%; border: 3px solid var(--ink); background: var(--butter); font-size: 22px; display: grid; place-items: center; }
+.stage { background: var(--paper); border: 3px solid var(--ink); border-radius: var(--r-lg); padding: clamp(14px, 3vw, 24px); }
+
+/* ---------- Choice games ---------- */
+.prompt-row { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 18px; text-align: center; }
+.listen-big { display: inline-flex; align-items: center; gap: 10px; font-family: var(--f-display); font-weight: 800; font-size: 22px; background: var(--crimson); color: #fff; border: 3px solid var(--ink); border-radius: 999px; padding: 12px 24px; box-shadow: 0 5px 0 var(--crimson-deep); }
+.listen-big:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--crimson-deep); }
+.prompt-pic { font-size: 74px; }
+.prompt-q { font-family: var(--f-display); font-size: 24px; font-weight: 800; }
+.options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.opt { display: grid; justify-items: center; align-content: center; gap: 8px; min-height: 150px; padding: 12px 8px; background: var(--paper); border: 3px solid var(--ink); border-radius: var(--r-lg); transition: transform .12s ease; }
+.opt:hover { transform: translateY(-2px); }
+.opt .pic { font-size: clamp(54px, 10vw, 76px); }
+.opt .room-mini { width: 100%; max-width: 150px; aspect-ratio: 4 / 3; font-size: clamp(26px, 5vw, 38px); }
+.opt .word { font-family: var(--f-display); font-weight: 800; font-size: 18px; min-height: 1.3em; }
+.opt .word.hidden { visibility: hidden; }
+.opt.right { background: var(--ok-bg); border-color: var(--ok); }
+.opt.wrong { background: var(--no-bg); border-color: var(--no); }
+
+/* ---------- Drag & drop ---------- */
+.dnd-help { font-size: 14px; color: var(--ink-soft); margin: 0 0 10px; }
+.tray { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 14px; min-height: 96px; border: 3px dashed var(--ink-soft); border-radius: var(--r-lg); background: #F3F7FA; margin-bottom: 18px; }
+.tray-empty { align-self: center; color: var(--ink-soft); font-weight: 700; }
+.drag-item {
+  touch-action: none; user-select: none; -webkit-user-select: none;
+  display: inline-grid; justify-items: center; gap: 2px; padding: 8px 12px; min-width: 86px;
+  background: var(--paper); border: 3px solid var(--ink); border-radius: var(--r-md);
+  box-shadow: 0 4px 0 rgba(42,34,51,.25); cursor: grab;
+}
+.drag-item .pic { font-size: 40px; }
+.drag-item .lbl { font-weight: 700; font-size: 15px; white-space: nowrap; }
+.drag-item.is-selected { background: #FFF4CC; border-color: var(--crimson); box-shadow: 0 0 0 4px var(--butter); }
+.drag-item.is-lifted { opacity: .25; }
+.drag-item.letter { min-width: 64px; font-family: var(--f-display); font-weight: 800; font-size: 38px; padding: 6px 14px; }
+.drag-item.word { font-family: var(--f-display); font-weight: 800; font-size: 20px; grid-auto-flow: column; align-items: center; gap: 8px; }
+.drag-item.word .room-mini { width: 40px; height: 32px; font-size: 14px; border-width: 2px; border-radius: 8px; }
+.ghost { position: fixed; left: 0; top: 0; z-index: 1000; pointer-events: none; margin: 0; box-shadow: 0 14px 24px rgba(42,34,51,.3); }
+
+.zones { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.zone {
+  display: flex; flex-direction: column; min-height: 210px; border: 3px solid var(--ink); border-radius: var(--r-lg); overflow: hidden;
+  background: linear-gradient(to top, rgba(120,72,40,.18) 0 30%, transparent 30%), var(--wall);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.zone-head { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; background: rgba(255,255,255,.7); border-bottom: 3px solid var(--ink); font-family: var(--f-display); font-weight: 800; font-size: 18px; }
+.zone-items { flex: 1; display: flex; flex-wrap: wrap; align-content: flex-start; justify-content: center; gap: 6px; padding: 10px; }
+.zone.is-target { box-shadow: 0 0 0 4px var(--butter); }
+.zone.is-over { transform: scale(1.03); box-shadow: 0 0 0 6px var(--crimson); }
+.placed { display: inline-flex; align-items: center; gap: 4px; background: rgba(255,255,255,.92); border: 2px solid var(--ok); border-radius: 999px; padding: 2px 10px 2px 4px; font-weight: 700; font-size: 14px; animation: pop .35s ease; }
+.placed .pic { font-size: 22px; }
+
+.sentence { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; font-family: var(--f-display); font-weight: 800; font-size: clamp(22px, 4.4vw, 34px); margin: 8px 0 22px; }
+.blank { min-width: 7ch; min-height: 1.6em; display: inline-grid; place-items: center; border: 3px dashed var(--crimson); border-radius: 12px; background: #FFF6F8; padding: 2px 12px; color: var(--crimson); }
+.blank.filled { border-style: solid; border-color: var(--ok); background: var(--ok-bg); color: var(--ok); }
+.blank.is-target { box-shadow: 0 0 0 4px var(--butter); }
+.blank.is-over { box-shadow: 0 0 0 6px var(--crimson); transform: scale(1.04); }
+.letters { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 6px 0 22px; }
+.letter-box { width: 1.25em; height: 1.5em; display: grid; place-items: center; border-bottom: 4px solid var(--ink); font-family: var(--f-display); font-weight: 800; font-size: clamp(30px, 6vw, 46px); }
+.letter-box.space { border-bottom-color: transparent; width: .6em; }
+.letter-box.blank { min-width: 0; width: 1.25em; border: 3px dashed var(--crimson); border-radius: 10px; padding: 0; }
+.letter-box.blank.filled { border-style: solid; }
+
+/* ---------- House (explore + Cloud) ---------- */
+.explore { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.house { max-width: 560px; width: 100%; margin: 0 auto; }
+.house-roof { height: 70px; background: var(--crimson) radial-gradient(var(--dot) 2.4px, transparent 3px) 0 0 / 16px 16px; clip-path: polygon(0 100%, 12% 0, 88% 0, 100% 100%); }
+.house-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; padding: 5px; background: var(--ink); }
+.room {
+  position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px;
+  aspect-ratio: 1 / .92; padding: 8px 4px; border: 0; border-radius: 4px;
+  background: linear-gradient(to top, rgba(120,72,40,.20) 0 24%, transparent 24%), var(--wall);
+  transition: filter .12s ease, transform .12s ease;
+}
+.room:hover { filter: brightness(1.05); }
+.room.balcony { background: repeating-linear-gradient(90deg, transparent 0 12px, rgba(42,34,51,.55) 12px 15px) bottom / 100% 30% no-repeat, var(--wall); }
+.room.span2 { grid-column: span 2; aspect-ratio: auto; }
+.room.span3 { grid-column: span 3; aspect-ratio: auto; min-height: 90px; }
+.room-objs { font-family: var(--f-emoji); font-size: clamp(22px, 5vw, 34px); display: flex; gap: 2px; align-items: flex-end; flex-wrap: wrap; justify-content: center; }
+.room-label { background: #fff; border: 2px solid var(--crimson); color: var(--crimson-deep); border-radius: 999px; padding: 0 10px 2px; font-family: var(--f-display); font-weight: 800; font-size: clamp(12px, 2.4vw, 16px); white-space: nowrap; }
+.room.is-active { outline: 5px solid var(--butter); outline-offset: -5px; z-index: 1; }
+.room .seen { position: absolute; top: 5px; right: 6px; width: 22px; height: 22px; border-radius: 50%; background: var(--ok); color: #fff; display: grid; place-items: center; font-size: 13px; font-weight: 700; }
+.room.right { outline: 5px solid var(--ok); outline-offset: -5px; }
+.house-ground { height: 22px; background: var(--grass); border-radius: 0 0 14px 14px; }
+.cat { position: absolute; top: 8px; left: 50%; font-family: var(--f-emoji); font-size: clamp(34px, 7vw, 52px); transform: translateX(-50%); animation: pop .4s ease; }
+
+.panel { background: var(--paper); border: 3px solid var(--ink); border-radius: var(--r-lg); overflow: hidden; }
+.panel-band { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 3px solid var(--ink); background: linear-gradient(to top, rgba(120,72,40,.18) 0 22%, transparent 22%), var(--wall); }
+.panel-band h2 { font-size: clamp(26px, 4vw, 34px); font-weight: 800; }
+.panel-band .es { font-size: 15px; color: var(--ink-soft); font-weight: 700; }
+.panel-body { padding: 14px 16px 18px; display: grid; gap: 14px; }
+.panel-body h3 { font-family: var(--f-body); font-size: 14px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--crimson-deep); }
+.thing-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+.thing { display: grid; justify-items: center; gap: 4px; padding: 8px 4px; border: 2px solid var(--ink); border-radius: var(--r-md); background: var(--paper); }
+.thing .pic { font-size: 40px; }
+.thing b { font-size: 16px; }
+.thing small { font-size: 12px; color: var(--ink-soft); }
+.say-line { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 8px 12px; border: 2px solid var(--ink); border-radius: var(--r-md); background: #F7FAFC; }
+.say-line .pic { font-size: 30px; }
+.say-line .pic.multi { width: auto; }
+.say-line b { font-size: 17px; }
+.say-line small { display: block; color: var(--ink-soft); font-size: 13px; }
+.say-line .spk { margin-left: auto; font-family: var(--f-emoji); }
+.tapped { animation: pop .3s ease; }
+
+/* ---------- Win overlay ---------- */
+.overlay { position: fixed; inset: 0; z-index: 900; display: grid; place-items: center; background: rgba(42,34,51,.55);
+  padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.win-card { width: min(440px, 100%); background: var(--paper); border: 4px solid var(--ink); border-radius: 28px; padding: 24px 20px; text-align: center; display: grid; gap: 12px; animation: pop .45s ease; }
+.win-card h2 { font-size: 36px; color: var(--crimson); }
+.big-stars { display: flex; justify-content: center; gap: 8px; font-size: 54px; font-family: var(--f-emoji); }
+.big-stars span { animation: pop .5s ease both; }
+.big-stars .off { filter: grayscale(1); opacity: .25; }
+.win-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.btn { min-height: 48px; padding: 8px 18px; border-radius: 999px; border: 3px solid var(--ink); background: var(--paper); font-weight: 700; font-size: 16px; }
+.btn.primary { background: var(--crimson); color: #fff; box-shadow: 0 4px 0 var(--crimson-deep); }
+#confetti { position: fixed; inset: 0; z-index: 950; pointer-events: none; }
+
+@keyframes pop { 0% { transform: scale(.6); opacity: 0; } 70% { transform: scale(1.08); opacity: 1; } 100% { transform: scale(1); } }
+.cat { animation-name: catpop; }
+@keyframes catpop { 0% { transform: translateX(-50%) scale(.4); opacity: 0; } 70% { transform: translateX(-50%) scale(1.15); opacity: 1; } 100% { transform: translateX(-50%) scale(1); } }
+@keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-8px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(5px); } }
+.shake { animation: shake .4s ease; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (max-width: 760px) {
+  .explore { grid-template-columns: minmax(0, 1fr); }
+  .zones { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .facade { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 14px 12px; }
+  .roof { height: 110px; }
+  .options { gap: 8px; }
+  .opt { min-height: 120px; }
+  .door-hint { position: static; margin: 10px 0 8px; }
+  .ground { padding-top: 0; }
+  .win-sub { font-size: 13px; }
+  .brand span, .btn-txt { display: none; }
+  .pill-btn { padding: 6px 10px; }
+  .topbar-in { flex-wrap: nowrap; gap: 6px; }
+  .progress i { width: 10px; height: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <button class="brand" id="brandBtn" type="button" aria-label="Ir a la casa (inicio)">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 15 16 5l12 10" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 13v14h16V13" fill="#fff"/><rect x="14" y="19" width="5" height="8" fill="#C42341"/></svg>
+      <span>My House</span>
+    </button>
+    <div class="spacer"></div>
+    <span class="star-total" id="starTotal" aria-live="polite"></span>
+    <button class="pill-btn" id="slowBtn" type="button" aria-pressed="false" aria-label="Voz lenta"><span class="emoji" aria-hidden="true">🐢</span><span class="btn-txt">Lento</span></button>
+    <button class="pill-btn" id="soundBtn" type="button" aria-pressed="true" aria-label="Sonido"><span class="emoji" aria-hidden="true" id="soundIcon">🔊</span><span class="btn-txt">Sonido</span></button>
+  </div>
+</header>
+<main class="wrap" id="app"></main>
+<div class="sr-only" aria-live="polite" id="live"></div>
+
+<script>
+'use strict';
+document.documentElement.lang = 'es';
+/* =========================================================
+   1. DATA — Unidad 6 "My House" (Inglés 1° básico, Mineduc)
+   Todo el contenido es estático y de confianza (no hay entrada de usuario).
+   ========================================================= */
+const SVG = {
+  fridge: '<svg viewBox="0 0 64 64"><rect x="16" y="4" width="32" height="56" rx="6" fill="#DCEFFA" stroke="#2A2233" stroke-width="3"/><line x1="16" y1="24" x2="48" y2="24" stroke="#2A2233" stroke-width="3"/><rect x="40" y="11" width="3.5" height="8" rx="1.5" fill="#2A2233"/><rect x="40" y="30" width="3.5" height="12" rx="1.5" fill="#2A2233"/><circle cx="25" cy="35" r="3.2" fill="#F2667E"/><rect x="22" y="11" width="8" height="7" rx="1.5" fill="#FFD25C"/></svg>',
+  stove: '<svg viewBox="0 0 64 64"><rect x="10" y="12" width="44" height="48" rx="5" fill="#F4F4F6" stroke="#2A2233" stroke-width="3"/><rect x="10" y="12" width="44" height="11" rx="4" fill="#C42341" stroke="#2A2233" stroke-width="3"/><circle cx="20" cy="17.5" r="2.2" fill="#fff"/><circle cx="28" cy="17.5" r="2.2" fill="#fff"/><circle cx="36" cy="17.5" r="2.2" fill="#fff"/><circle cx="44" cy="17.5" r="2.2" fill="#fff"/><rect x="17" y="30" width="30" height="22" rx="3" fill="#3A3346"/><rect x="21" y="34" width="22" height="3.5" rx="1.5" fill="#FFB13D"/><path d="M22 6c0 3 4 3 4 6M34 5c0 3 4 3 4 6" fill="none" stroke="#8A93A6" stroke-width="2.5" stroke-linecap="round"/></svg>',
+  table: '<svg viewBox="0 0 64 64"><path d="M15 30v26M49 30v26" stroke="#2A2233" stroke-width="7" stroke-linecap="round"/><path d="M15 30v26M49 30v26" stroke="#B9783A" stroke-width="3" stroke-linecap="round"/><ellipse cx="32" cy="25" rx="28" ry="9" fill="#F7C873" stroke="#2A2233" stroke-width="3"/><ellipse cx="32" cy="23" rx="10" ry="3" fill="#F2667E"/></svg>',
+  lamp: '<svg viewBox="0 0 64 64"><path d="M20 6h24l9 22H11z" fill="#FFD25C" stroke="#2A2233" stroke-width="3" stroke-linejoin="round"/><path d="M32 28v26" stroke="#2A2233" stroke-width="3.5"/><ellipse cx="32" cy="57" rx="13" ry="4.5" fill="#5B8DEF" stroke="#2A2233" stroke-width="3"/></svg>',
+  sink: '<svg viewBox="0 0 64 64"><path d="M26 18v-7h12v4" fill="none" stroke="#8A93A6" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M38 17v4" stroke="#5BB7E8" stroke-width="3" stroke-linecap="round"/><path d="M8 24h48c0 11-10 17-24 17S8 35 8 24z" fill="#FFFFFF" stroke="#2A2233" stroke-width="3" stroke-linejoin="round"/><path d="M26 41h12l-2 17h-8z" fill="#FFFFFF" stroke="#2A2233" stroke-width="3" stroke-linejoin="round"/></svg>'
+};
+
+const ROOMS = [
+  { id: 'bathroom', en: 'bathroom',    es: 'baño' },
+  { id: 'bedroom',  en: 'bedroom',     es: 'dormitorio' },
+  { id: 'balcony',  en: 'balcony',     es: 'balcón', extra: true },
+  { id: 'kitchen',  en: 'kitchen',     es: 'cocina' },
+  { id: 'dining',   en: 'dining room', es: 'comedor' },
+  { id: 'living',   en: 'living room', es: 'living / sala de estar' },
+  { id: 'garden',   en: 'garden',      es: 'jardín', extra: true }
+];
+const MAIN_ROOMS = ROOMS.filter(r => !r.extra);
+const ROOM_IDS = new Set(ROOMS.map(r => r.id).concat(['door']));
+const roomById = id => ROOMS.find(r => r.id === id);
+
+const OBJECTS = [
+  { id: 'sofa',    en: 'sofa',        es: 'sofá',          room: 'living',   e: '🛋️' },
+  { id: 'tv',      en: 'TV',          es: 'televisor',     room: 'living',   e: '📺' },
+  { id: 'lamp',    en: 'lamp',        es: 'lámpara',       room: 'living',   svg: 'lamp' },
+  { id: 'picture', en: 'picture',     es: 'cuadro',        room: 'living',   e: '🖼️' },
+  { id: 'fridge',  en: 'fridge',      es: 'refrigerador',  room: 'kitchen',  svg: 'fridge' },
+  { id: 'stove',   en: 'stove',       es: 'cocina (artefacto)', room: 'kitchen', svg: 'stove' },
+  { id: 'pan',     en: 'pan',         es: 'sartén',        room: 'kitchen',  e: '🍳' },
+  { id: 'cup',     en: 'cup',         es: 'taza',          room: 'kitchen',  e: '☕' },
+  { id: 'toilet',  en: 'toilet',      es: 'inodoro (WC)',  room: 'bathroom', e: '🚽' },
+  { id: 'shower',  en: 'shower',      es: 'ducha',         room: 'bathroom', e: '🚿' },
+  { id: 'bathtub', en: 'bathtub',     es: 'tina',          room: 'bathroom', e: '🛁' },
+  { id: 'sink',    en: 'sink',        es: 'lavamanos',     room: 'bathroom', svg: 'sink' },
+  { id: 'bed',     en: 'bed',         es: 'cama',          room: 'bedroom',  e: '🛏️' },
+  { id: 'teddy',   en: 'teddy bear',  es: 'osito de peluche', room: 'bedroom', e: '🧸' },
+  { id: 'ball',    en: 'ball',        es: 'pelota',        room: 'bedroom',  e: '⚽' },
+  { id: 'clock',   en: 'alarm clock', es: 'despertador',   room: 'bedroom',  e: '⏰' },
+  { id: 'table',   en: 'table',       es: 'mesa',          room: 'dining',   svg: 'table' },
+  { id: 'chair',   en: 'chair',       es: 'silla',         room: 'dining',   e: '🪑' },
+  { id: 'plate',   en: 'plate',       es: 'plato',         room: 'dining',   e: '🍽️' },
+  { id: 'glass',   en: 'glass',       es: 'vaso',          room: 'dining',   e: '🥛' },
+  { id: 'flowers', en: 'flowers',     es: 'flores',        room: 'balcony',  e: '💐', plural: true },
+  { id: 'plant',   en: 'plant',       es: 'planta',        room: 'balcony',  e: '🪴' },
+  { id: 'tree',    en: 'tree',        es: 'árbol',         room: 'garden',   e: '🌳' },
+  { id: 'dog',     en: 'dog house',   es: 'casita del perro', room: 'garden', e: '🐕' }
+];
+const PARTS = [
+  { id: 'door',   en: 'door',      es: 'puerta',       e: '🚪' },
+  { id: 'window', en: 'window',    es: 'ventana',      e: '🪟' },
+  { id: 'house',  en: 'house',     es: 'casa',         e: '🏠' },
+  { id: 'apt',    en: 'apartment', es: 'departamento', e: '🏢' }
+];
+const ACTIONS = [
+  { id: 'read',   en: 'read a book',     es: 'leer un libro',     room: 'living',   e: '🧒📖' },
+  { id: 'tv',     en: 'watch TV',        es: 'ver televisión',    room: 'living',   e: '🧒📺' },
+  { id: 'cook',   en: 'cook',            es: 'cocinar',           room: 'kitchen',  e: '🧑‍🍳' },
+  { id: 'wash',   en: 'wash the dishes', es: 'lavar la loza',     room: 'kitchen',  e: '🧽🍽️' },
+  { id: 'shower', en: 'take a shower',   es: 'ducharse',          room: 'bathroom', e: '🛀' },
+  { id: 'teeth',  en: 'brush my teeth',  es: 'lavarme los dientes', room: 'bathroom', e: '🪥😁' },
+  { id: 'sleep',  en: 'sleep',           es: 'dormir',            room: 'bedroom',  e: '😴' },
+  { id: 'play',   en: 'play',            es: 'jugar',             room: 'bedroom',  e: '🧒🧩' },
+  { id: 'eat',    en: 'eat lunch',       es: 'almorzar',          room: 'dining',   e: '😋🍲' },
+  { id: 'water',  en: 'water the plants', es: 'regar las plantas', room: 'balcony', e: '🪴💧' },
+  { id: 'run',    en: 'run and jump',    es: 'correr y saltar',   room: 'garden',   e: '🏃🌳' }
+];
+const objsOf = roomId => OBJECTS.filter(o => o.room === roomId);
+const actsOf = roomId => ACTIONS.filter(a => a.room === roomId);
+const theWord = o => (o.plural ? 'the ' + o.en + ' are' : 'the ' + o.en + ' is');
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const sentenceOf = a => 'I ' + a.en + ' in the ' + roomById(a.room).en + '.';
+
+const GAMES = [
+  { id: 'listen',   icon: '👂', en: 'Listen and point',     es: 'Escucha y toca el dibujo', dnd: false },
+  { id: 'objects',  icon: '🛏️', en: 'Where does it go?',    es: 'Arrastra cada objeto a su habitación', dnd: true },
+  { id: 'actions',  icon: '🛀', en: 'What do you do here?', es: 'Arrastra cada acción a su habitación', dnd: true },
+  { id: 'complete', icon: '✏️', en: 'Trace and complete',   es: 'Completa palabras y oraciones', dnd: true },
+  { id: 'cloud',    icon: '🐱', en: "Where's Cloud?",       es: 'Escucha y encuentra al gato Cloud', dnd: false },
+  { id: 'quiz',     icon: '⭐', en: 'My Progress',          es: 'Prueba final de la unidad', dnd: false }
+];
+const GAME_IDS = GAMES.map(g => g.id);
+
+/* =========================================================
+   2. HELPERS
+   ========================================================= */
+function h(tag, props, ...kids) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(props || {})) {
+    if (v == null || v === false) continue;
+    if (k === 'class') n.className = v;
+    else if (k === 'text') n.textContent = v;
+    else if (k === 'style') n.setAttribute('style', v);
+    else if (k.startsWith('on') && typeof v === 'function') n.addEventListener(k.slice(2), v);
+    else n.setAttribute(k, v === true ? '' : String(v));
+  }
+  for (const c of kids.flat(Infinity)) {
+    if (c == null || c === false) continue;
+    n.append(c instanceof Node ? c : document.createTextNode(String(c)));
+  }
+  return n;
+}
+const shuffle = arr => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const sample = (arr, n) => shuffle(arr).slice(0, n);
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const announce = t => { const l = document.getElementById('live'); l.textContent = ''; setTimeout(() => { l.textContent = t; }, 30); };
+function shake(el) { el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
+function bump(el) { el.classList.remove('tapped'); void el.offsetWidth; el.classList.add('tapped'); }
+
+/** Picture of an item. SVG strings come only from the trusted SVG constant above. */
+function pic(item, extra) {
+  const s = h('span', { class: 'pic' + (extra ? ' ' + extra : ''), 'aria-hidden': 'true' });
+  if (item.svg && Object.prototype.hasOwnProperty.call(SVG, item.svg)) { s.innerHTML = SVG[item.svg]; s.classList.add('is-svg'); }
+  else s.textContent = item.e || '';
+  return s;
+}
+function roomPic(room, n = 2) {
+  const objs = h('span', { class: 'objs' }, objsOf(room.id).slice(0, n).map(o => pic(o)));
+  return h('span', { class: 'room-mini', style: '--wall: var(--room-' + room.id + ')', 'aria-hidden': 'true' }, objs);
+}
+
+/* =========================================================
+   3. SETTINGS + PROGRESS (localStorage, validated, best-effort)
+   ========================================================= */
+const Store = {
+  key: 'myhouse-unit6-v1',
+  defaults() { return { stars: Object.fromEntries(GAME_IDS.map(g => [g, 0])), visited: [], slow: false, sound: true }; },
+  read() {
+    const out = this.defaults();
+    try {
+      const raw = localStorage.getItem(this.key);
+      if (!raw || raw.length > 4000) return out;
+      const o = JSON.parse(raw);
+      if (o && typeof o === 'object') {
+        for (const g of GAME_IDS) { const n = Number(o.stars && o.stars[g]); if (Number.isInteger(n) && n >= 0 && n <= 3) out.stars[g] = n; }
+        if (Array.isArray(o.visited)) out.visited = o.visited.filter(id => typeof id === 'string' && ROOM_IDS.has(id));
+        out.slow = o.slow === true; out.sound = o.sound !== false;
+      }
+    } catch (_) { /* storage blocked: play without saving */ }
+    return out;
+  },
+  write(state) { try { localStorage.setItem(this.key, JSON.stringify(state)); } catch (_) {} }
+};
+const State = Store.read();
+const save = () => Store.write(State);
+
+/* =========================================================
+   4. AUDIO — Web Speech (voz) + Web Audio (efectos)
+   ========================================================= */
+const Voice = (() => {
+  const synth = 'speechSynthesis' in window ? window.speechSynthesis : null;
+  let voices = [];
+  const load = () => { try { voices = synth ? synth.getVoices() : []; } catch (_) { voices = []; } };
+  if (synth) { load(); try { synth.addEventListener('voiceschanged', load); } catch (_) { synth.onvoiceschanged = load; } }
+  const nice = /Samantha|Google|Natural|Enhanced|Premium|Paulina|Mónica|Monica|Ava|Allison|Karen/i;
+  function pick(lang) {
+    const pref = lang === 'es' ? ['es-cl', 'es-419', 'es-mx', 'es-us', 'es-es'] : ['en-us', 'en-gb', 'en-au'];
+    for (const p of pref) {
+      const c = voices.filter(v => (v.lang || '').replace('_', '-').toLowerCase() === p);
+      if (c.length) return c.find(v => nice.test(v.name)) || c.find(v => v.localService) || c[0];
+    }
+    return voices.find(v => (v.lang || '').toLowerCase().startsWith(lang)) || null;
+  }
+  let token = 0;
+  function speak(text, lang = 'en') {
+    if (!synth || !State.sound) return Promise.resolve();
+    const my = ++token;
+    try { synth.cancel(); } catch (_) {}
+    return new Promise(resolve => {
+      setTimeout(() => {
+        if (my !== token) return resolve();
+        let done = false; const fin = () => { if (!done) { done = true; resolve(); } };
+        try {
+          const u = new SpeechSynthesisUtterance(text);
+          const v = pick(lang);
+          if (v) u.voice = v;
+          u.lang = v ? v.lang : (lang === 'es' ? 'es-CL' : 'en-US');
+          u.rate = (State.slow ? 0.7 : 0.88) * (lang === 'es' ? 1.08 : 1);
+          u.pitch = 1.05;
+          u.onend = fin; u.onerror = fin;
+          setTimeout(fin, 1500 + text.length * 120);
+          synth.speak(u);
+        } catch (_) { fin(); }
+      }, 50);
+    });
+  }
+  return { speak, supported: !!synth, stop() { token++; try { synth && synth.cancel(); } catch (_) {} } };
+})();
+const say = (t) => Voice.speak(t, 'en');
+const sayEs = (t) => Voice.speak(t, 'es');
+
+const Sfx = (() => {
+  let ctx = null;
+  function get() {
+    if (!ctx) { const C = window.AudioContext || window.webkitAudioContext; if (!C) return null; try { ctx = new C(); } catch (_) { return null; } }
+    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+    return ctx;
+  }
+  function tone(f, at, dur, type = 'triangle', vol = 0.16) {
+    if (!State.sound) return; const c = get(); if (!c) return;
+    const o = c.createOscillator(), g = c.createGain(); const t = c.currentTime + at;
+    o.type = type; o.frequency.value = f;
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + dur + 0.05);
+  }
+  return {
+    ok() { tone(660, 0, .14); tone(990, .11, .24); },
+    no() { tone(240, 0, .16, 'square', .06); tone(190, .13, .22, 'square', .05); },
+    win() { [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, i * .11, .32)); },
+    pick() { tone(520, 0, .07, 'sine', .1); }
+  };
+})();
+
+/* =========================================================
+   5. DRAG & DROP — Pointer Events (mouse + touch + pen)
+   Arrastrar o tocar-y-tocar (accesible con teclado: Enter/Espacio).
+   ========================================================= */
+function createDnD({ onDrop, onPick }) {
+  let selected = null; const zones = new Set();
+  const clearSel = () => { if (selected) selected.classList.remove('is-selected'); selected = null; zones.forEach(z => z.classList.remove('is-target')); };
+  const zoneAt = (x, y) => { const el = document.elementFromPoint(x, y); return el && el.closest ? el.closest('[data-zone]') : null; };
+  function select(item) {
+    if (selected === item) { clearSel(); return; }
+    clearSel(); selected = item; item.classList.add('is-selected'); zones.forEach(z => z.classList.add('is-target'));
+    onPick && onPick(item);
+  }
+  function tryDrop(item, zone) {
+    const ok = onDrop(item, zone);
+    if (ok) clearSel(); else { shake(zone); }
+    return ok;
+  }
+  function addItem(item) {
+    item.classList.add('drag-item');
+    item.setAttribute('type', 'button');
+    let st = null;
+    item.addEventListener('pointerdown', e => {
+      if (item.disabled || (e.pointerType === 'mouse' && e.button !== 0)) return;
+      e.preventDefault();
+      st = { x: e.clientX, y: e.clientY, id: e.pointerId, drag: false, ghost: null, over: null };
+      try { item.setPointerCapture(e.pointerId); } catch (_) {}
+    });
+    item.addEventListener('pointermove', e => {
+      if (!st || e.pointerId !== st.id) return;
+      if (!st.drag && Math.hypot(e.clientX - st.x, e.clientY - st.y) > 8) {
+        st.drag = true; clearSel();
+        const r = item.getBoundingClientRect();
+        st.ox = st.x - r.left; st.oy = st.y - r.top;
+        const g = item.cloneNode(true); g.classList.add('ghost'); g.removeAttribute('id'); g.setAttribute('aria-hidden', 'true');
+        g.style.width = r.width + 'px'; g.style.height = r.height + 'px';
+        document.body.append(g); st.ghost = g; item.classList.add('is-lifted');
+        onPick && onPick(item);
+      }
+      if (st.drag) {
+        st.ghost.style.transform = 'translate(' + (e.clientX - st.ox) + 'px,' + (e.clientY - st.oy) + 'px) rotate(-4deg) scale(1.08)';
+        const z = zoneAt(e.clientX, e.clientY);
+        if (z !== st.over) { st.over && st.over.classList.remove('is-over'); z && z.classList.add('is-over'); st.over = z; }
+      }
+    });
+    const end = (e, cancelled) => {
+      if (!st || e.pointerId !== st.id) return;
+      const s = st; st = null;
+      if (s.drag) {
+        s.over && s.over.classList.remove('is-over');
+        const z = cancelled ? null : zoneAt(e.clientX, e.clientY);
+        const ok = z ? tryDrop(item, z) : false;
+        if (ok) { s.ghost.remove(); item.classList.remove('is-lifted'); }
+        else {
+          const r = item.getBoundingClientRect();
+          s.ghost.style.transition = 'transform .28s ease';
+          s.ghost.style.transform = 'translate(' + r.left + 'px,' + r.top + 'px)';
+          setTimeout(() => { s.ghost.remove(); item.classList.remove('is-lifted'); }, 300);
+        }
+      } else if (!cancelled) select(item);
+    };
+    item.addEventListener('pointerup', e => end(e, false));
+    item.addEventListener('pointercancel', e => end(e, true));
+    item.addEventListener('lostpointercapture', e => { if (st && st.drag) end(e, true); });
+    item.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(item); } });
+  }
+  function addZone(zone, key) {
+    zone.dataset.zone = key; zones.add(zone);
+    zone.setAttribute('tabindex', '0'); zone.setAttribute('role', 'button');
+    const go = () => { if (selected) tryDrop(selected, zone); };
+    zone.addEventListener('click', go);
+    zone.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+  }
+  return { addItem, addZone, clearSel };
+}
+
+/* =========================================================
+   6. APP SHELL + NAV
+   ========================================================= */
+const app = document.getElementById('app');
+let teardown = null; // cancels pending timers from the current screen
+function mount(node) {
+  if (teardown) teardown();
+  teardown = null;
+  Voice.stop();
+  document.querySelectorAll('.ghost, .overlay').forEach(n => n.remove());
+  app.replaceChildren(node);
+  window.scrollTo({ top: 0 });
+  updateTop();
+}
+function updateTop() {
+  const total = GAME_IDS.reduce((s, g) => s + State.stars[g], 0);
+  document.getElementById('starTotal').textContent = '⭐ ' + total + ' / ' + GAME_IDS.length * 3;
+  const sb = document.getElementById('soundBtn'), slb = document.getElementById('slowBtn');
+  sb.setAttribute('aria-pressed', String(State.sound));
+  document.getElementById('soundIcon').textContent = State.sound ? '🔊' : '🔇';
+  slb.setAttribute('aria-pressed', String(State.slow));
+}
+document.getElementById('brandBtn').addEventListener('click', () => go('home'));
+document.getElementById('soundBtn').addEventListener('click', () => { State.sound = !State.sound; if (!State.sound) Voice.stop(); save(); updateTop(); });
+document.getElementById('slowBtn').addEventListener('click', () => { State.slow = !State.slow; save(); updateTop(); say(State.slow ? 'Slow' : 'Normal'); });
+
+const SCREENS = {};
+function go(name) {
+  const fn = SCREENS[name] || SCREENS.home;
+  const target = name in SCREENS ? name : 'home';
+  if (location.hash.slice(1) !== target) { try { history.replaceState(null, '', target === 'home' ? location.pathname + location.search : '#' + target); } catch (_) {} }
+  mount(fn());
+}
+
+/** Common activity frame: back button, title, step dots, spoken instruction. */
+function activityShell(game, instrEn, instrEs, steps) {
+  const dots = h('div', { class: 'progress', 'aria-label': 'Progreso' }, Array.from({ length: steps }, () => h('i')));
+  const stage = h('section', { class: 'stage' });
+  const instr = h('div', { class: 'instr' },
+    h('div', { class: 'instr-num', 'aria-hidden': 'true' }, String(GAME_IDS.indexOf(game.id) + 1)),
+    h('div', { class: 'instr-text' }, h('strong', { text: instrEn }), h('span', { text: instrEs })),
+    h('button', { class: 'say-btn', type: 'button', 'aria-label': 'Escuchar instrucciones', onclick: async () => { await sayEs(instrEs); say(instrEn); } }, h('span', { class: 'emoji', text: '🔊' }))
+  );
+  const root = h('div', {},
+    h('div', { class: 'act-head' },
+      h('button', { class: 'back-btn', type: 'button', onclick: () => go('home') }, h('span', { 'aria-hidden': 'true', text: '←' }), 'Casa'),
+      h('h1', { class: 'act-title', text: game.en }),
+      dots),
+    instr, stage);
+  const setStep = i => [...dots.children].forEach((d, k) => { d.className = k < i ? 'done' : (k === i ? 'now' : ''); });
+  setStep(0);
+  return { root, stage, setStep };
+}
+
+function starsFromMistakes(m, total) {
+  const ratio = m / Math.max(1, total);
+  return ratio <= 0.15 ? 3 : ratio <= 0.45 ? 2 : 1;
+}
+
+function finish(game, stars) {
+  const prev = State.stars[game.id];
+  if (stars > prev) { State.stars[game.id] = stars; save(); }
+  updateTop();
+  Sfx.win();
+  const praise = stars === 3 ? 'Excellent!' : stars === 2 ? 'Very good!' : 'Good job!';
+  const esLine = stars === 3 ? '¡Perfecto! Ganaste 3 estrellas.' : stars === 2 ? '¡Muy bien! Juega otra vez para ganar 3.' : '¡Bien! Practica otra vez y lo harás mejor.';
+  const card = h('div', { class: 'win-card', role: 'dialog', 'aria-modal': 'true', 'aria-label': praise },
+    h('div', { class: 'big-stars' }, [1, 2, 3].map(i => h('span', { class: i <= stars ? '' : 'off', style: 'animation-delay:' + (i * 0.15) + 's', text: '⭐' }))),
+    h('h2', { text: praise }),
+    h('p', { style: 'margin:0', text: esLine }),
+    h('div', { class: 'win-actions' },
+      h('button', { class: 'btn primary', type: 'button', onclick: () => go(game.id) }, 'Jugar otra vez'),
+      h('button', { class: 'btn', type: 'button', onclick: () => go('home') }, 'Volver a la casa')));
+  const ov = h('div', { class: 'overlay' }, card);
+  document.body.append(ov);
+  card.querySelector('.btn.primary').focus();
+  confetti();
+  say(praise);
+}
+
+function confetti() {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const c = h('canvas', { id: 'confetti', 'aria-hidden': 'true' }); document.body.append(c);
+  const ctx = c.getContext('2d'); if (!ctx) { c.remove(); return; }
+  const W = c.width = innerWidth, H = c.height = innerHeight;
+  const cols = ['#C42341', '#FFD25C', '#3E8FC6', '#6DBE6A', '#F7A9BD', '#9DC9F2'];
+  const P = Array.from({ length: 140 }, () => ({ x: Math.random() * W, y: -20 - Math.random() * H * .5, vx: (Math.random() - .5) * 3, vy: 2 + Math.random() * 4, r: 4 + Math.random() * 6, a: Math.random() * 6, va: (Math.random() - .5) * .3, c: cols[Math.floor(Math.random() * cols.length)] }));
+  const t0 = performance.now();
+  (function frame(t) {
+    ctx.clearRect(0, 0, W, H);
+    for (const p of P) { p.x += p.vx; p.y += p.vy; p.vy += .05; p.a += p.va; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.a); ctx.fillStyle = p.c; ctx.fillRect(-p.r / 2, -p.r / 4, p.r, p.r / 2); ctx.restore(); }
+    if (t - t0 < 2600) requestAnimationFrame(frame); else c.remove();
+  })(t0);
+}
+
+/* =========================================================
+   7. SCREENS
+   ========================================================= */
+
+/* ---------- HOME ---------- */
+SCREENS.home = () => {
+  const win = g => h('button', { class: 'win', type: 'button', onclick: () => go(g.id), 'aria-label': g.en + '. ' + g.es + '. ' + State.stars[g.id] + ' de 3 estrellas' },
+    h('div', { class: 'win-glass' },
+      g.dnd ? h('span', { class: 'win-tag', text: 'Arrastra' }) : null,
+      h('span', { class: 'emoji', text: g.icon })),
+    h('div', { class: 'win-body' },
+      h('span', { class: 'win-title', text: g.en }),
+      h('span', { class: 'win-sub', text: g.es }),
+      h('span', { class: 'stars', 'aria-hidden': 'true' }, [1, 2, 3].map(i => h('span', { class: 'emoji' + (i <= State.stars[g.id] ? '' : ' off'), text: '⭐' })))));
+
+  const vocab = (title, items, speakFn) => h('div', { class: 'vocab-group' },
+    h('h3', { text: title }),
+    h('div', { class: 'chips' }, items.map(it => h('button', { class: 'chip', type: 'button', onclick: e => { bump(e.currentTarget); speakFn(it); } }, (it.e || it.svg) ? pic(it) : pic({ e: (objsOf(it.id)[0] || {}).e || '🏠', svg: (objsOf(it.id)[0] || {}).svg }), it.en))));
+
+  return h('div', {},
+    Voice.supported ? null : h('p', { class: 'notice', text: 'Este navegador no tiene voz sintetizada, así que el juego no podrá decir las palabras en inglés. Prueba con Chrome, Edge o Safari.' }),
+    h('p', { class: 'home-intro', text: 'Juego de inglés para 1° básico · Unidad 6 «My House». Empieza por la puerta para conocer la casa y luego toca una ventana para jugar.' }),
+    h('div', { class: 'building' },
+      h('div', { class: 'roof' }, h('div', { class: 'roof-sign' }, h('small', { text: 'Unit 6' }), h('h1', { text: 'My House' }))),
+      h('div', { class: 'facade' }, GAMES.map(win)),
+      h('div', { class: 'ground' },
+        h('span', { class: 'door-hint', text: 'Empieza aquí 👇' }),
+        h('button', { class: 'door-btn', type: 'button', onclick: () => go('explore') },
+          h('span', { class: 'emoji', 'aria-hidden': 'true', text: '🏠' }),
+          h('strong', { text: 'Explore the house' }),
+          h('span', { class: 'sub', text: 'Toca cada habitación y escucha' }))),
+      h('div', { class: 'lawn', 'aria-hidden': 'true' })),
+    h('section', { class: 'family', 'aria-labelledby': 'famTitle' },
+      h('h2', { id: 'famTitle', text: 'Vocabulario de la unidad' }),
+      h('p', { text: 'Toca cualquier palabra para escucharla. Para papás y mamás: el juego dice todo en voz alta (botón 🐢 para hablar más lento) y guarda las estrellas solo en este navegador.' }),
+      vocab('Rooms · Habitaciones', ROOMS, r => say(r.en)),
+      vocab('Things · Objetos', OBJECTS.filter(o => !roomById(o.room).extra), o => say(o.en)),
+      vocab('Actions · Acciones', ACTIONS.filter(a => !roomById(a.room).extra), a => say(sentenceOf(a))),
+      vocab('Parts of the house · Partes de la casa', PARTS, p => say(p.en))));
+};
+
+/* ---------- HOUSE (shared by Explore and Cloud) ---------- */
+function buildHouse({ onRoom, withDoor = true, activeId = null, showSeen = false }) {
+  const tile = (room, extraCls) => {
+    const objs = room.id === 'door' ? PARTS.slice(0, 2) : objsOf(room.id).slice(0, room.extra ? 2 : 3);
+    const b = h('button', { class: 'room' + (room.id === 'balcony' ? ' balcony' : '') + (extraCls ? ' ' + extraCls : ''), type: 'button', style: '--wall: var(--room-' + room.id + ')', 'data-room': room.id, 'aria-label': room.en },
+      showSeen && State.visited.includes(room.id) ? h('span', { class: 'seen', 'aria-hidden': 'true', text: '✓' }) : null,
+      h('span', { class: 'room-objs', 'aria-hidden': 'true' }, objs.map(o => pic(o))),
+      h('span', { class: 'room-label', text: room.en }));
+    if (room.id === activeId) b.classList.add('is-active');
+    b.addEventListener('click', () => onRoom(room, b));
+    return b;
+  };
+  const grid = h('div', { class: 'house-grid' }, ROOMS.filter(r => r.id !== 'garden').map(r => tile(r)));
+  const garden = roomById('garden');
+  if (withDoor) { grid.append(tile(garden, 'span2'), tile({ id: 'door', en: 'door', es: 'puerta' })); }
+  else grid.append(tile(garden, 'span3'));
+  return h('div', { class: 'house' }, h('div', { class: 'house-roof', 'aria-hidden': 'true' }), grid, h('div', { class: 'house-ground', 'aria-hidden': 'true' }));
+}
+
+/* ---------- EXPLORE ---------- */
+SCREENS.explore = () => {
+  const game = { id: 'explore', en: 'Explore the house' };
+  const panelSlot = h('div');
+  let house;
+  const sayLine = (picItem, en, es, speakText) => h('button', { class: 'say-line', type: 'button', onclick: e => { bump(e.currentTarget); say(speakText || en); } },
+    pic(picItem), h('span', {}, h('b', { text: en }), h('small', { text: es })), h('span', { class: 'spk', 'aria-hidden': 'true', text: '🔊' }));
+  const thing = o => h('button', { class: 'thing', type: 'button', onclick: e => { bump(e.currentTarget); say(o.en); } }, pic(o), h('b', { text: o.en }), h('small', { text: o.es }));
+
+  function showRoom(room, speak) {
+    house.querySelectorAll('.room').forEach(t => t.classList.toggle('is-active', t.dataset.room === room.id));
+    if (!State.visited.includes(room.id)) {
+      State.visited.push(room.id); save();
+      const t = house.querySelector('[data-room="' + room.id + '"]');
+      if (t && !t.querySelector('.seen')) t.prepend(h('span', { class: 'seen', 'aria-hidden': 'true', text: '✓' }));
+    }
+    let body;
+    if (room.id === 'door') {
+      body = [h('h3', { text: 'Parts of the house' }), h('div', { class: 'thing-grid' }, PARTS.map(thing)),
+        sayLine({ e: '🏠' }, 'This is my house!', '¡Esta es mi casa!'),
+        sayLine({ e: '🏢' }, 'I live in an apartment.', 'Yo vivo en un departamento.')];
+    } else {
+      const acts = actsOf(room.id);
+      body = [
+        sayLine({ e: '👉' }, 'This is the ' + room.en + '.', 'Este es el/la ' + room.es + '.'),
+        h('h3', { text: 'Things · Objetos' }), h('div', { class: 'thing-grid' }, objsOf(room.id).map(thing)),
+        acts.length ? h('h3', { text: 'Actions · ¿Qué hago aquí?' }) : null,
+        acts.map(a => sayLine(a, sentenceOf(a), 'Yo ' + a.es + ' en el/la ' + room.es + '.'))
+      ];
+    }
+    const panel = h('div', { class: 'panel', style: '--wall: var(--room-' + room.id + ')' },
+      h('div', { class: 'panel-band' },
+        h('div', {}, h('h2', { text: room.id === 'door' ? 'door' : room.en }), h('span', { class: 'es', text: room.es })),
+        h('button', { class: 'say-btn', type: 'button', 'aria-label': 'Escuchar', onclick: () => say(room.en) }, h('span', { class: 'emoji', text: '🔊' }))),
+      h('div', { class: 'panel-body' }, body));
+    panelSlot.replaceChildren(panel);
+    if (speak) say(room.id === 'door' ? 'door' : room.en);
+    if (speak && matchMedia('(max-width: 760px)').matches) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  house = buildHouse({ onRoom: r => showRoom(r, true), showSeen: true, activeId: 'living' });
+  const root = h('div', {},
+    h('div', { class: 'act-head' },
+      h('button', { class: 'back-btn', type: 'button', onclick: () => go('home') }, h('span', { 'aria-hidden': 'true', text: '←' }), 'Casa'),
+      h('h1', { class: 'act-title', text: game.en })),
+    h('div', { class: 'instr' },
+      h('div', { class: 'instr-num', 'aria-hidden': 'true', text: '🏠' }),
+      h('div', { class: 'instr-text' }, h('strong', { text: 'Listen and point.' }), h('span', { text: 'Toca una habitación. Luego toca cada objeto y cada acción para escucharlos.' })),
+      h('button', { class: 'say-btn', type: 'button', 'aria-label': 'Escuchar instrucciones', onclick: async () => { await sayEs('Toca una habitación. Luego toca cada objeto y cada acción para escucharlos.'); say('Listen and point.'); } }, h('span', { class: 'emoji', text: '🔊' }))),
+    h('div', { class: 'explore' }, house, panelSlot));
+  showRoom(roomById('living'), false);
+  return root;
+};
+
+/* ---------- Generic choice engine (Listen and point / Quiz) ---------- */
+function choiceGame(game, instrEn, instrEs, rounds) {
+  const { root, stage, setStep } = activityShell(game, instrEn, instrEs, rounds.length);
+  let i = 0, mistakes = 0, alive = true;
+  teardown = () => { alive = false; };
+  function render() {
+    const r = rounds[i]; setStep(i);
+    let locked = false, missed = false;
+    const replay = () => r.speak();
+    const prompt = h('div', { class: 'prompt-row' },
+      r.visual || null,
+      r.question ? h('div', { class: 'prompt-q', text: r.question }) : null,
+      h('button', { class: 'listen-big', type: 'button', onclick: replay }, h('span', { class: 'emoji', 'aria-hidden': 'true', text: '🔊' }), 'Listen'));
+    const opts = h('div', { class: 'options' }, r.options.map(o => {
+      const word = h('span', { class: 'word' + (r.hideWords ? ' hidden' : ''), text: o.label });
+      const b = h('button', { class: 'opt', type: 'button', 'aria-label': r.hideWords ? 'Opción' : o.label }, o.node, word);
+      b.addEventListener('click', async () => {
+        if (locked) return;
+        if (o.correct) {
+          locked = true; b.classList.add('right'); word.classList.remove('hidden'); Sfx.ok(); announce('¡Correcto!');
+          await (o.after ? say(o.after) : say(o.label));
+          await wait(500);
+          if (!alive) return;
+          i++; if (i < rounds.length) render(); else { setStep(rounds.length); finish(game, starsFromMistakes(mistakes, rounds.length)); }
+        } else {
+          if (!missed) mistakes++; missed = true;
+          b.classList.add('wrong'); shake(b); Sfx.no(); announce('Intenta otra vez');
+          setTimeout(() => { if (alive) b.classList.remove('wrong'); replay(); }, 650);
+        }
+      });
+      return b;
+    }));
+    stage.replaceChildren(prompt, opts);
+    setTimeout(() => { if (alive) replay(); }, 250);
+  }
+  render();
+  return root;
+}
+
+function pointRound(kind) {
+  if (kind === 'room') {
+    const opts = sample(MAIN_ROOMS.concat(roomById('balcony'), roomById('garden')), 3); const t = opts[0];
+    return { hideWords: true, speak: () => say(t.en), options: shuffle(opts).map(r => ({ node: roomPic(r, 2), label: r.en, correct: r === t, after: 'This is the ' + r.en + '.' })) };
+  }
+  if (kind === 'object') {
+    const pool = OBJECTS.filter(o => !roomById(o.room).extra); const t = sample(pool, 1)[0];
+    const others = sample(pool.filter(o => o.room !== t.room), 2);
+    return { hideWords: true, speak: () => say(t.en), options: shuffle([t, ...others]).map(o => ({ node: pic(o), label: o.en, correct: o === t })) };
+  }
+  const pool = ACTIONS.filter(a => !roomById(a.room).extra); const t = sample(pool, 1)[0];
+  const others = sample(pool.filter(a => a.room !== t.room), 2);
+  return { hideWords: true, speak: () => say(t.en), options: shuffle([t, ...others]).map(a => ({ node: pic(a), label: a.en, correct: a === t, after: sentenceOf(a) })) };
+}
+
+SCREENS.listen = () => {
+  const game = GAMES.find(g => g.id === 'listen');
+  const kinds = shuffle(['room', 'room', 'room', 'object', 'object', 'object', 'action', 'action']);
+  return choiceGame(game, 'Listen and point.', 'Escucha la palabra y toca el dibujo correcto.', kinds.map(pointRound));
+};
+
+SCREENS.quiz = () => {
+  const game = GAMES.find(g => g.id === 'quiz');
+  const roomOpts = (target) => shuffle([target, ...sample(MAIN_ROOMS.filter(r => r !== target), 2)]);
+  const actQ = () => {
+    const a = sample(ACTIONS.filter(x => !roomById(x.room).extra), 1)[0]; const t = roomById(a.room);
+    const q = 'Where do you ' + a.en.replace('my teeth', 'your teeth') + '?';
+    return { visual: h('div', { class: 'prompt-pic' }, pic(a)), question: q, speak: () => say(q),
+      options: roomOpts(t).map(r => ({ node: roomPic(r), label: r.en, correct: r === t, after: sentenceOf(a) })) };
+  };
+  const objQ = () => {
+    const o = sample(OBJECTS.filter(x => !roomById(x.room).extra), 1)[0]; const t = roomById(o.room);
+    const q = (o.plural ? 'Where are the ' : 'Where is the ') + o.en + '?';
+    return { visual: h('div', { class: 'prompt-pic' }, pic(o)), question: q, speak: () => say(q),
+      options: roomOpts(t).map(r => ({ node: roomPic(r), label: r.en, correct: r === t, after: cap(theWord(o)) + ' in the ' + t.en + '.' })) };
+  };
+  const rounds = shuffle([pointRound('room'), pointRound('object'), pointRound('action'), actQ(), actQ(), objQ(), objQ(), objQ()]);
+  return choiceGame(game, 'Listen and choose.', 'Escucha la pregunta y elige la respuesta correcta.', rounds);
+};
+
+/* ---------- DRAG & DROP: objects / actions into rooms ---------- */
+function sortGame(game, instrEn, instrEs, itemsFor, sentenceFor, labelFor) {
+  const rooms = sample(MAIN_ROOMS, 4);
+  const items = shuffle(rooms.flatMap(r => itemsFor(r)));
+  const { root, stage, setStep } = activityShell(game, instrEn, instrEs, items.length);
+  let placed = 0, mistakes = 0, alive = true; const missedIds = new Set();
+  teardown = () => { alive = false; };
+  const tray = h('div', { class: 'tray', 'aria-label': 'Bandeja de tarjetas' });
+  const zonesEl = h('div', { class: 'zones' });
+  const zoneMap = new Map();
+  const dnd = createDnD({
+    onPick: item => { Sfx.pick(); say(labelFor(item._data)); },
+    onDrop: (item, zone) => {
+      const d = item._data;
+      if (zone.dataset.zone === d.room) {
+        Sfx.ok(); placed++; setStep(placed);
+        item.remove();
+        zoneMap.get(d.room).append(h('span', { class: 'placed' }, pic(d), labelFor(d)));
+        say(sentenceFor(d));
+        announce('¡Correcto!');
+        if (!tray.querySelector('.drag-item')) {
+          tray.replaceChildren(h('span', { class: 'tray-empty', text: '¡Listo! 🎉' }));
+          setTimeout(() => { if (alive) finish(game, starsFromMistakes(mistakes, items.length)); }, 1800);
+        }
+        return true;
+      }
+      if (!missedIds.has(d.id)) { missedIds.add(d.id); mistakes++; }
+      Sfx.no(); announce('Esa no es. Intenta otra vez.');
+      say('No. Try again!');
+      return false;
+    }
+  });
+  rooms.forEach(r => {
+    const itemsBox = h('div', { class: 'zone-items' });
+    const z = h('div', { class: 'zone', style: '--wall: var(--room-' + r.id + ')', 'aria-label': r.en },
+      h('div', { class: 'zone-head' }, h('span', { text: r.en })), itemsBox);
+    zoneMap.set(r.id, itemsBox);
+    dnd.addZone(z, r.id);
+    zonesEl.append(z);
+  });
+  items.forEach(d => {
+    const b = h('button', { 'aria-label': labelFor(d) }, pic(d), h('span', { class: 'lbl', text: labelFor(d) }));
+    b._data = d; dnd.addItem(b); tray.append(b);
+  });
+  stage.append(h('p', { class: 'dnd-help', text: 'Arrastra la tarjeta a la habitación, o tócala y luego toca la habitación.' }), tray, zonesEl);
+  return root;
+}
+SCREENS.objects = () => sortGame(GAMES.find(g => g.id === 'objects'), 'Drag and match.', 'Arrastra cada objeto a la habitación donde va.',
+  r => sample(objsOf(r.id), 2), o => cap(theWord(o)) + ' in the ' + roomById(o.room).en + '.', o => o.en);
+SCREENS.actions = () => sortGame(GAMES.find(g => g.id === 'actions'), 'What do you do here?', 'Arrastra cada acción a la habitación donde la haces.',
+  r => actsOf(r.id), a => sentenceOf(a), a => a.en);
+
+/* ---------- DRAG & DROP: complete sentences and words ---------- */
+SCREENS.complete = () => {
+  const game = GAMES.find(g => g.id === 'complete');
+  const acts = sample(ACTIONS.filter(a => !roomById(a.room).extra), 3);
+  const wordPool = MAIN_ROOMS.map(r => ({ word: r.en, item: r, isRoom: true }))
+    .concat(OBJECTS.filter(o => !roomById(o.room).extra && /^[a-z]+$/.test(o.en) && o.en.length >= 3).map(o => ({ word: o.en, item: o })))
+    .concat(PARTS.slice(0, 2).map(p => ({ word: p.en, item: p })));
+  const words = sample(wordPool, 3);
+  const rounds = shuffle(acts.map(a => ({ type: 'sentence', a })).concat(words.map(w => ({ type: 'letter', w }))));
+  const { root, stage, setStep } = activityShell(game, 'Trace and complete.', 'Arrastra la palabra o la letra que falta al espacio vacío.', rounds.length);
+  let i = 0, mistakes = 0, alive = true;
+  teardown = () => { alive = false; };
+
+  function next() { i++; if (i < rounds.length) render(); else { setStep(rounds.length); finish(game, starsFromMistakes(mistakes, rounds.length)); } }
+
+  function render() {
+    setStep(i); const r = rounds[i]; let missed = false, done = false;
+    const tray = h('div', { class: 'tray' });
+    if (r.type === 'sentence') {
+      const room = roomById(r.a.room);
+      const blank = h('span', { class: 'blank', 'aria-label': 'espacio vacío', text: '?' });
+      const sentence = h('div', { class: 'sentence' }, h('span', { text: 'I ' + r.a.en + ' in the' }), blank, h('span', { text: '.' }));
+      const choices = shuffle([room, ...sample(MAIN_ROOMS.filter(x => x !== room), 2)]);
+      const dnd = createDnD({
+        onPick: item => { Sfx.pick(); say(item._data.en); },
+        onDrop: (item, zone) => {
+          if (done) return false;
+          if (item._data === room) {
+            done = true; Sfx.ok(); item.remove(); blank.textContent = room.en; blank.classList.add('filled');
+            tray.querySelectorAll('.drag-item').forEach(b => { b.disabled = true; });
+            say(sentenceOf(r.a)).then(() => wait(700)).then(() => { if (alive) next(); });
+            return true;
+          }
+          if (!missed) { missed = true; mistakes++; }
+          Sfx.no(); say('No. Try again!'); return false;
+        }
+      });
+      dnd.addZone(blank, 'blank');
+      choices.forEach(c => { const b = h('button', { class: 'word', 'aria-label': c.en }, roomPic(c), h('span', { text: c.en })); b._data = c; dnd.addItem(b); tray.append(b); });
+      stage.replaceChildren(
+        h('div', { class: 'prompt-row' }, h('div', { class: 'prompt-pic' }, pic(r.a)),
+          h('button', { class: 'listen-big', type: 'button', onclick: () => say('I ' + r.a.en + ' in the...') }, h('span', { class: 'emoji', 'aria-hidden': 'true', text: '🔊' }), 'Listen')),
+        sentence, tray);
+      setTimeout(() => { if (alive) say('I ' + r.a.en + ' in the...'); }, 250);
+    } else {
+      const word = r.w.word; const letters = [...word];
+      const candidates = letters.map((ch, k) => ({ ch, k })).filter(x => /[a-z]/.test(x.ch));
+      const gap = sample(candidates, 1)[0];
+      const blank = h('span', { class: 'letter-box blank', 'aria-label': 'letra que falta', text: '' });
+      const row = h('div', { class: 'letters', 'aria-label': 'Palabra con una letra que falta' }, letters.map((ch, k) => {
+        if (k === gap.k) return blank;
+        return h('span', { class: 'letter-box' + (ch === ' ' ? ' space' : ''), text: ch === ' ' ? '' : ch });
+      }));
+      const alphabet = 'abcdefghiklmnoprstuvwy'.split('').filter(c => c !== gap.ch);
+      const choices = shuffle([gap.ch, ...sample(alphabet, 2)]);
+      const dnd = createDnD({
+        onPick: () => Sfx.pick(),
+        onDrop: (item, zone) => {
+          if (done) return false;
+          if (item._data === gap.ch) {
+            done = true; Sfx.ok(); item.remove(); blank.textContent = gap.ch; blank.classList.add('filled');
+            tray.querySelectorAll('.drag-item').forEach(b => { b.disabled = true; });
+            say(word).then(() => wait(700)).then(() => { if (alive) next(); });
+            return true;
+          }
+          if (!missed) { missed = true; mistakes++; }
+          Sfx.no(); say('No. Try again!'); return false;
+        }
+      });
+      dnd.addZone(blank, 'blank');
+      choices.forEach(c => { const b = h('button', { class: 'letter', 'aria-label': 'letra ' + c, text: c }); b._data = c; dnd.addItem(b); tray.append(b); });
+      const visual = r.w.isRoom ? h('span', { style: 'display:inline-block;width:150px;max-width:100%;aspect-ratio:4/3;font-size:38px' }, roomPic(r.w.item, 2)) : h('div', { class: 'prompt-pic' }, pic(r.w.item));
+      if (r.w.isRoom) { visual.firstChild.style.width = '100%'; visual.firstChild.style.height = '100%'; }
+      stage.replaceChildren(
+        h('div', { class: 'prompt-row' }, visual,
+          h('button', { class: 'listen-big', type: 'button', onclick: () => say(word) }, h('span', { class: 'emoji', 'aria-hidden': 'true', text: '🔊' }), 'Listen')),
+        row, tray);
+      setTimeout(() => { if (alive) say(word); }, 250);
+    }
+  }
+  render();
+  return root;
+};
+
+/* ---------- WHERE'S CLOUD? ---------- */
+SCREENS.cloud = () => {
+  const game = GAMES.find(g => g.id === 'cloud');
+  const N = 6; const targets = [];
+  const pool = ROOMS.slice();
+  while (targets.length < N) { const t = sample(pool, 1)[0]; if (t !== targets[targets.length - 1]) targets.push(t); }
+  const { root, stage, setStep } = activityShell(game, "Where's Cloud?", 'Cloud es un gato que se esconde. Escucha dónde está y toca esa habitación.', N);
+  let i = 0, mistakes = 0, alive = true;
+  teardown = () => { alive = false; };
+  function render() {
+    setStep(i); const t = targets[i]; let locked = false, missed = false;
+    const line = "Where's Cloud? Cloud is in the " + t.en + '.';
+    const house = buildHouse({
+      withDoor: false,
+      onRoom: async (room, tile) => {
+        if (locked) return;
+        if (room === t) {
+          locked = true; tile.classList.add('right'); tile.append(h('span', { class: 'cat', 'aria-hidden': 'true', text: '🐱' }));
+          Sfx.ok(); announce('¡Encontraste a Cloud!');
+          await say('Meow! Yes! Cloud is in the ' + t.en + '!');
+          await wait(600); if (!alive) return;
+          i++; if (i < N) render(); else { setStep(N); finish(game, starsFromMistakes(mistakes, N)); }
+        } else {
+          if (!missed) { missed = true; mistakes++; }
+          shake(tile); Sfx.no();
+          await say('No. Cloud is not in the ' + room.en + '.');
+          if (alive && !locked) say('Cloud is in the ' + t.en + '.');
+        }
+      }
+    });
+    stage.replaceChildren(
+      h('div', { class: 'prompt-row' },
+        h('div', { class: 'prompt-q' }, h('span', { class: 'emoji', 'aria-hidden': 'true', text: '🐱 ' }), "Where's Cloud?"),
+        h('button', { class: 'listen-big', type: 'button', onclick: () => say(line) }, h('span', { class: 'emoji', 'aria-hidden': 'true', text: '🔊' }), 'Listen')),
+      house);
+    setTimeout(() => { if (alive) say(line); }, 250);
+  }
+  render();
+  return root;
+};
+
+/* =========================================================
+   8. BOOT + hash routing
+   ========================================================= */
+function routeFromHash() { const n = location.hash.slice(1); go(n && SCREENS[n] ? n : 'home'); }
+window.addEventListener('hashchange', routeFromHash);
+routeFromHash();
+</script>
+</body>
+</html>
