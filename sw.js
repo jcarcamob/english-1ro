@@ -5,7 +5,7 @@
  * - Anything else: not intercepted (no caching of third-party content).
  * Bump VERSION on every release so clients drop old caches.
  */
-const VERSION = 'v1.1.0';
+const VERSION = 'v1.1.1';
 const APP_CACHE = 'myhouse-app-' + VERSION;
 const FONT_CACHE = 'myhouse-fonts-v1';
 const FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com'];

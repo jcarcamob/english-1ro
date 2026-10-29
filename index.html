@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-MkqeIjDa8+4r3FiKZWjuzZSY1fDHRYcq5oNj9H2fGk4='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-TYG79VSkDyVwNr2VCSLevsZwjzkgwVdmuJjg2JrPIKQ='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="description" content="Juego web de inglés para 1° básico: Unidad 6 My House (habitaciones, objetos y acciones).">
 <meta name="theme-color" content="#C42341">
@@ -167,10 +167,25 @@ h1, h2, h3 { font-family: var(--f-display); line-height: 1.1; text-wrap: balance
 .family h2 { font-size: 22px; }
 .family p { margin: 0; color: var(--ink-soft); max-width: 65ch; }
 .vocab-group { display: grid; gap: 8px; }
-.vocab-group h3 { font-size: 15px; font-family: var(--f-body); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--crimson-deep); }
+.vocab-group h3 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; font-size: 15px; font-family: var(--f-body); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--crimson-deep); }
+.vocab-group h3 small { font-size: 13px; letter-spacing: .04em; text-transform: none; color: var(--ink-soft); font-weight: 700; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.chip { display: inline-flex; align-items: center; gap: 6px; background: var(--paper); border: 2px solid var(--ink); border-radius: 999px; padding: 4px 12px 4px 6px; font-size: 15px; font-weight: 700; }
-.chip .pic { width: 26px; height: 26px; font-size: 20px; }
+.chip { display: inline-flex; align-items: center; gap: 8px; min-width: 0; min-height: 48px; text-align: left; background: var(--paper); border: 2px solid var(--ink); border-radius: 16px; padding: 5px 12px 5px 8px; font-size: 15px; }
+.chip .pic { flex: none; min-width: 28px; height: 28px; font-size: 22px; }
+.chip .pic.is-svg { width: 28px; }
+.chip .pic.multi { font-size: 17px; letter-spacing: -2px; }
+.chip-txt { display: grid; min-width: 0; line-height: 1.15; }
+.chip-txt b { font-weight: 700; }
+.chip-txt small { font-size: 12px; color: var(--ink-soft); }
+@media (max-width: 560px) {
+  .family { margin-top: 24px; gap: 12px; }
+  .family h2 { font-size: 20px; }
+  .family p { font-size: 14px; }
+  .chips { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .chip { padding: 5px 8px 5px 6px; gap: 6px; }
+  .chip-txt b { font-size: 14px; }
+  .chip-txt small { font-size: 11px; }
+}
 .notice { background: var(--no-bg); border: 2px solid var(--no); border-radius: var(--r-md); padding: 10px 14px; max-width: 760px; margin: 0 auto 14px; }
 
 /* ---------- Pictures ---------- */
@@ -855,9 +870,11 @@ SCREENS.home = () => {
       h('span', { class: 'win-sub', text: g.es }),
       h('span', { class: 'stars', 'aria-hidden': 'true' }, [1, 2, 3].map(i => h('span', { class: 'emoji' + (i <= State.stars[g.id] ? '' : ' off'), text: '⭐' })))));
 
-  const vocab = (title, items, speakFn) => h('div', { class: 'vocab-group' },
-    h('h3', { text: title }),
-    h('div', { class: 'chips' }, items.map(it => h('button', { class: 'chip', type: 'button', onclick: e => { bump(e.currentTarget); speakFn(it); } }, (it.e || it.svg) ? pic(it) : pic({ e: (objsOf(it.id)[0] || {}).e || '🏠', svg: (objsOf(it.id)[0] || {}).svg }), it.en))));
+  const vocab = (titleEn, titleEs, items, speakFn) => h('div', { class: 'vocab-group' },
+    h('h3', {}, h('span', { text: titleEn }), h('small', { text: titleEs })),
+    h('div', { class: 'chips' }, items.map(it => h('button', { class: 'chip', type: 'button', 'aria-label': it.en + ' — ' + it.es, onclick: e => { bump(e.currentTarget); speakFn(it); } },
+      (it.e || it.svg) ? pic(it) : pic({ e: (objsOf(it.id)[0] || {}).e || '🏠', svg: (objsOf(it.id)[0] || {}).svg }),
+      h('span', { class: 'chip-txt' }, h('b', { text: it.en }), h('small', { text: it.es }))))));
 
   return h('div', {},
     Voice.supported ? null : h('p', { class: 'notice', text: 'Este navegador no tiene voz sintetizada, así que el juego no podrá decir las palabras en inglés. Prueba con Chrome, Edge o Safari.' }),
@@ -875,10 +892,10 @@ SCREENS.home = () => {
     h('section', { class: 'family', 'aria-labelledby': 'famTitle' },
       h('h2', { id: 'famTitle', text: 'Vocabulario de la unidad' }),
       h('p', { text: 'Toca cualquier palabra para escucharla. Para papás y mamás: el juego dice todo en voz alta (botón 🐢 para hablar más lento) y guarda las estrellas solo en este navegador.' }),
-      vocab('Rooms · Habitaciones', ROOMS, r => say(r.en)),
-      vocab('Things · Objetos', OBJECTS.filter(o => !roomById(o.room).extra), o => say(o.en)),
-      vocab('Actions · Acciones', ACTIONS.filter(a => !roomById(a.room).extra), a => say(sentenceOf(a))),
-      vocab('Parts of the house · Partes de la casa', PARTS, p => say(p.en))));
+      vocab('Rooms', 'Habitaciones', ROOMS, r => say(r.en)),
+      vocab('Things', 'Objetos', OBJECTS.filter(o => !roomById(o.room).extra), o => say(o.en)),
+      vocab('Actions', 'Acciones', ACTIONS.filter(a => !roomById(a.room).extra), a => say(sentenceOf(a))),
+      vocab('Parts of the house', 'Partes de la casa', PARTS, p => say(p.en))));
 };
 
 /* ---------- HOUSE (shared by Explore and Michi) ---------- */
